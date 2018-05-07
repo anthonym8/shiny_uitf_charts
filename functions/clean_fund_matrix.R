@@ -47,7 +47,8 @@ clean_fund_matrix <- function(fund_matrix){
         "32" = "PSBank",
         "33" = "Sterling",
         "34" = "Robinsons Bank",
-        "36" = "CTBC"
+        "36" = "CTBC",
+        "39" = "Manulife"
     )
     
     fund_matrix <- fund_matrix %>% 
