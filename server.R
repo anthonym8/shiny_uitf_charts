@@ -7,12 +7,14 @@ library(dplyr)
 library(lubridate)
 library(zoo)
 
+
+rm(list = ls())
 source("./functions/get_fund_matrix.R")
 source("./functions/clean_fund_matrix.R")
 source("./functions/get_navpu.R")
 source("./functions/compute_rsi.R")
 source("./functions/compute_macd.R")
-rm(list = ls())
+
 analytics_prices <- data_frame()
 
 shinyServer(function(input, output, session) {
