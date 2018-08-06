@@ -48,13 +48,23 @@ clean_fund_matrix <- function(fund_matrix){
         "33" = "Sterling",
         "34" = "Robinsons Bank",
         "36" = "CTBC",
-        "39" = "Manulife"
+        "39" = "Manulife",
+        "40" = "Maybank"
     )
     
+    map_names <- function(x, dict) {
+        if(as.character(x) %in% names(dict)) {
+            return(dict[[as.character(x)]])
+        } else {
+            return(NA)
+        }
+    }
+    
     fund_matrix <- fund_matrix %>% 
-        mutate(bank_alias = map_chr(bank_id, function(x){ bank_alias[[as.character(x)]] })) %>%
+        mutate(bank_alias = map_chr(bank_id, map_names, bank_alias)) %>%
+        mutate(bank_alias = map2_chr(bank_alias, as.character(Bank), function(x, y){if(!is.na(x)) x else y})) %>% 
         mutate(`Fund Name` = str_trim(str_replace(`Fund Name`, bank_alias, ""))) %>% 
-        mutate(complete_name = paste(bank_alias, `Fund Name`, sep=" - "))
+        mutate(complete_name = paste(bank_alias, `Fund Name`, sep=" - ")) %>% View
 
     return(fund_matrix)
 }
