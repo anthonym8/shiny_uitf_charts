@@ -64,7 +64,7 @@ clean_fund_matrix <- function(fund_matrix){
         mutate(bank_alias = map_chr(bank_id, map_names, bank_alias)) %>%
         mutate(bank_alias = map2_chr(bank_alias, as.character(Bank), function(x, y){if(!is.na(x)) x else y})) %>% 
         mutate(`Fund Name` = str_trim(str_replace(`Fund Name`, bank_alias, ""))) %>% 
-        mutate(complete_name = paste(bank_alias, `Fund Name`, sep=" - ")) %>% View
+        mutate(complete_name = paste(bank_alias, `Fund Name`, sep=" - "))
 
     return(fund_matrix)
 }
