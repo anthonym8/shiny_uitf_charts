@@ -49,7 +49,8 @@ get_fund_matrix <- function() {
         getNodeSet(c("/html/body/table")) %>% 
         `[[`(1) %>% 
         readHTMLTable() %>% 
-        as_data_frame()
+        select(-Remarks) %>% 
+        as_tibble()
     
     
     # add details to fund matrix
