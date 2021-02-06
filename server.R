@@ -1,11 +1,13 @@
 
-library(shiny)
-library(DT)
-library(ggplot2)
-library(plotly)
-library(dplyr)
-library(lubridate)
-library(zoo)
+require(shiny)
+require(DT)
+require(ggplot2)
+require(plotly)
+require(dplyr)
+require(lubridate)
+require(zoo)
+require(XML)
+require(RCurl)
 
 
 rm(list = ls())
@@ -15,7 +17,7 @@ source("./functions/get_navpu.R")
 source("./functions/compute_rsi.R")
 source("./functions/compute_macd.R")
 
-analytics_prices <- data_frame()
+analytics_prices <- tibble()
 
 shinyServer(function(input, output, session) {
     
@@ -276,14 +278,37 @@ shinyServer(function(input, output, session) {
     # Render Composite Chart
     output$analytics_composite_chart <- renderPlotly({
         if(input$analytics_select_fund == "None") return()
-        plot_list <- list(navpu = navpu_chart())
-        if("RSI" %in% input$analytics_indicators) plot_list[["rsi"]] <- rsi_chart()
-        if("MACD" %in% input$analytics_indicators) plot_list[["macd"]] <- macd_chart()
-        subplot(plot_list, nrows=3, shareX=T, heights=c(0.4,0.3,0.3),
-                which_layout=1) %>% 
+        
+        plot_list <- list(chart_1 = navpu_chart())
+        
+        rsi_enabled <- "RSI" %in% input$analytics_indicators
+        macd_enabled <- "MACD" %in% input$analytics_indicators
+        
+        if (rsi_enabled & macd_enabled) {
+            plot_list[["chart_2"]] <- rsi_chart()
+            plot_list[["chart_3"]] <- macd_chart()
+        } else if (rsi_enabled & !macd_enabled) {
+            plot_list[["chart_2"]] <- rsi_chart()
+            plot_list[["chart_3"]] <- plotly_empty(type="scatter", mode="lines")
+        } else if (!rsi_enabled & macd_enabled) {
+            plot_list[["chart_2"]] <- macd_chart()
+            plot_list[["chart_3"]] <- plotly_empty(type="scatter", mode="lines")
+        } else {
+            plot_list[["chart_2"]] <- plotly_empty(type="scatter", mode="lines")
+            plot_list[["chart_3"]] <- plotly_empty(type="scatter", mode="lines")
+        } 
+        
+        plot <- subplot(plot_list,
+                nrows=3, 
+                shareX=T, 
+                heights=c(0.4,0.3,0.3),
+                which_layout=1
+                ) %>% 
             layout(xaxis = list(title="")) %>% 
             layout(plot_bgcolor = "rgb(250,250,250)") %>% 
             layout(legend = list(bgcolor="rgb(250,250,250)"))
+        
+        plot
     })
 
 })
